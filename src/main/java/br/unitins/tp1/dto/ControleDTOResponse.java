@@ -1,0 +1,46 @@
+package br.unitins.tp1.dto;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import br.unitins.tp1.model.Controle;
+
+public record ControleDTOResponse(
+    Long id,
+    String nome,
+    Double preco,
+    String cor,
+    Integer estoque,
+    String descricao,
+    LocalDate dataLancamento,
+    
+    String marca,
+    String plataforma,
+    String modelo,
+
+    // Especificação Técnica (resumida, só nome ou ID?)
+    Long idEspecificacaoTecnica,
+
+    // Lista das Categorias associadas
+    List<String> categorias
+) {
+    public static ControleDTOResponse valueOf(Controle controle) {
+        return new ControleDTOResponse(
+            controle.getId(),
+            controle.getNome(),
+            controle.getPreco(),
+            controle.getCor(),
+            controle.getEstoque(),
+            controle.getDescricao(),
+            controle.getDataLancamento(),
+            controle.getMarca() != null ? controle.getMarca().getNome() : null,
+            controle.getPlataforma() != null ? controle.getPlataforma().getNome() : null,
+            controle.getModelo() != null ? controle.getModelo().getNome() : null,
+            controle.getEspecificacaoTecnica() != null ? controle.getEspecificacaoTecnica().getId() : null,
+            controle.getCategorias() != null
+                ? controle.getCategorias().stream().map(c -> c.getNome()).collect(Collectors.toList())
+                : List.of()
+        );
+    }
+}

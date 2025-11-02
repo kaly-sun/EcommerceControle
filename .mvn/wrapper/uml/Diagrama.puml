@@ -1,0 +1,79 @@
+@startuml
+
+class Modelo {
+  
+  - nome : String
+  - versao : String
+  - anoLancamento : Int
+  - descricao : String
+  - codigoReferencia : String
+  - ativo : Boolean
+}
+
+class Produto {
+  - id : Int
+  - nome : String
+  - preco : Double
+  - estoque : Int
+  - dataCadastro : LocalDate
+  - ativo : Boolean
+}
+
+class Controle {
+  - descricao : String
+  - conectividade : String
+}
+
+class Cor {
+  - nome : String
+  - descricao : String
+}
+
+class Plataforma {
+  - nome : String
+  - fabricante : String
+  - geracao : String
+  - anoLancamento : Int
+  - tipo : String
+}
+
+class Marca {
+  - nome : String
+  - paisOrigem : String
+  - anoFundacao : Int
+  - siteOficial : String
+  - logoUrl : String
+}
+
+class Categoria {
+  - nome : String
+  - descricao : String
+}
+
+class EspecificacaoTecnica {
+  - peso : Double
+  - material : String
+  - autonomia : Int
+  - conectividade : String
+  - dimensoes : String
+  - sensoresExtras : String
+  - resistenciaAgua : String
+  - tempoCarregamento : String
+  - tecnologiaVibracao : String
+}
+
+' =====================
+' Herança
+Produto <|-- Controle
+
+' Associações
+Marca "1" --> "*" Controle
+Plataforma "*" --> "*" Controle
+Categoria "* " o-- "*" Controle
+Modelo "1" --> "*" Controle
+Cor "1" <-- "*" Controle
+
+' Composição
+Controle "1" *-- "1" EspecificacaoTecnica
+
+@enduml
