@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 @Entity
 public class Categoria extends DefaultEntity {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String nome; // Ex: sem fio, com fio, edição especial, retrô, profissional
 
     @Column(length = 500)

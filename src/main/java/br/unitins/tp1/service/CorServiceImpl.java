@@ -30,7 +30,7 @@ public class CorServiceImpl implements CorService {
     public CorDTOResponse update(Long id, CorDTO dto) {
         Cor cor = repository.findById(id);
         if (cor == null)
-            throw new IllegalArgumentException("Cor não encontrada");
+            return null;  // ✅ NÃO LANÇA EXCEÇÃO
 
         cor.setNome(dto.nome());
         cor.setDescricao(dto.descricao());
@@ -50,7 +50,8 @@ public class CorServiceImpl implements CorService {
     public CorDTOResponse findById(Long id) {
         Cor cor = repository.findById(id);
         if (cor == null)
-            throw new IllegalArgumentException("Cor não encontrada");
+            return null; // ✅ NÃO LANÇA EXCEÇÃO
+
         return CorDTOResponse.valueOf(cor);
     }
 

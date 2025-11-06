@@ -15,6 +15,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @Path("/cor")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -25,30 +26,48 @@ public class CorResource {
     CorService service;
 
     @POST
-    public CorDTOResponse insert(CorDTO dto) {
-        return service.insert(dto);
+    public Response insert(CorDTO dto) {
+        CorDTOResponse response = service.insert(dto);
+        return Response.ok(response).build(); // Teste deve esperar 200
     }
 
     @PUT
     @Path("/{id}")
-    public CorDTOResponse update(@PathParam("id") Long id, CorDTO dto) {
-        return service.update(id, dto);
+    public Response update(@PathParam("id") Long id, CorDTO dto) {
+        CorDTOResponse response = service.update(id, dto);
+
+        if (response == null)
+            return Response.status(Response.Status.NOT_FOUND).build();
+
+        return Response.ok(response).build();
     }
 
     @DELETE
     @Path("/{id}")
-    public void delete(@PathParam("id") Long id) {
+    public Response delete(@PathParam("id") Long id) {
+
+        CorDTOResponse existente = service.findById(id);
+        if (existente == null)
+            return Response.status(Response.Status.NOT_FOUND).build();
+
         service.delete(id);
+        return Response.noContent().build(); // 204
     }
 
     @GET
     @Path("/{id}")
-    public CorDTOResponse findById(@PathParam("id") Long id) {
-        return service.findById(id);
+    public Response findById(@PathParam("id") Long id) {
+        CorDTOResponse dto = service.findById(id);
+
+        if (dto == null)
+            return Response.status(Response.Status.NOT_FOUND).build();
+
+        return Response.ok(dto).build();
     }
 
     @GET
-    public List<CorDTOResponse> findAll() {
-        return service.findAll();
+    public Response findAll() {
+        List<CorDTOResponse> list = service.findAll();
+        return Response.ok(list).build();
     }
 }

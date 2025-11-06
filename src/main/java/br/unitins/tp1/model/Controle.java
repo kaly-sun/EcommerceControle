@@ -1,6 +1,7 @@
 package br.unitins.tp1.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -18,9 +19,7 @@ public class Controle extends DefaultEntity {
     private String nome;
     private Double preco;
 
-    // 🔜 Será substituído futuramente por entidade Cor
     private String cor;
-
     private Integer estoque;
 
     @Column(length = 1000)
@@ -28,36 +27,31 @@ public class Controle extends DefaultEntity {
 
     private LocalDate dataLancamento;
 
-    // 🔗 Relacionamento com Marca (muitos controles podem ter a mesma marca)
     @ManyToOne
     @JoinColumn(name = "id_marca")
     private Marca marca;
 
-    // 🔗 Relacionamento com Plataforma
     @ManyToOne
     @JoinColumn(name = "id_plataforma")
     private Plataforma plataforma;
 
-    // 🔗 Relacionamento com Categoria (um controle pode ter várias categorias)
     @ManyToMany
     @JoinTable(
         name = "controle_categoria",
         joinColumns = @JoinColumn(name = "id_controle"),
         inverseJoinColumns = @JoinColumn(name = "id_categoria")
     )
-    private List<Categoria> categorias;
+    private List<Categoria> categorias = new ArrayList<>();  // ✅ CORRIGIDO – nunca mais será null
 
-    // 🔗 Especificação Técnica única para cada Controle
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_especificacao_tecnica")
     private EspecificacaoTecnica especificacaoTecnica;
 
-    // 🔗 Relacionamento com Modelo
     @ManyToOne
     @JoinColumn(name = "id_modelo")
     private Modelo modelo;
 
-    // Getters e Setters
+    // Getters e setters
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 

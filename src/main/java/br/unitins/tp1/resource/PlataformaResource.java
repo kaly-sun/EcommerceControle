@@ -34,8 +34,10 @@ public class PlataformaResource {
     @Path("/{id}")
     public Response findById(@PathParam("id") Long id) {
         PlataformaDTOResponse response = service.findById(id);
+
         if (response == null)
             return Response.status(Response.Status.NOT_FOUND).build();
+
         return Response.ok(response).build();
     }
 
@@ -47,22 +49,28 @@ public class PlataformaResource {
 
     @POST
     public Response create(PlataformaDTO dto) {
-        return Response.status(Response.Status.CREATED).entity(service.create(dto)).build();
+        PlataformaDTOResponse response = service.create(dto);
+
+        // ✅ Teste espera 200, não 201
+        return Response.ok(response).build();
     }
 
     @PUT
     @Path("/{id}")
     public Response update(@PathParam("id") Long id, PlataformaDTO dto) {
         PlataformaDTOResponse response = service.update(id, dto);
+
         if (response == null)
             return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(response).build();
+
+        return Response.ok(response).build(); // ✅ Teste espera 200
     }
 
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") Long id) {
         service.delete(id);
-        return Response.status(Response.Status.NO_CONTENT).build();
+
+        return Response.status(Response.Status.NO_CONTENT).build(); // ✅ Teste espera 204
     }
 }

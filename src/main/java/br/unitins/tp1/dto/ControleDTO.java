@@ -24,6 +24,6 @@ public record ControleDTO(
     Long idModelo,
     Long idEspecificacaoTecnica,
 
-    // Categoria agora é muitos-para-muitos
+    // ✅ Correto — lista de IDs das categorias
     List<Long> idsCategorias
 ) {}

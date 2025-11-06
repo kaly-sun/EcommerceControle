@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 @Table(name = "marca")
 public class Marca extends DefaultEntity {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String nome;
 
     private String paisOrigem;

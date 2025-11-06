@@ -19,10 +19,8 @@ public record ControleDTOResponse(
     String plataforma,
     String modelo,
 
-    // Especificação Técnica (resumida, só nome ou ID?)
     Long idEspecificacaoTecnica,
 
-    // Lista das Categorias associadas
     List<String> categorias
 ) {
     public static ControleDTOResponse valueOf(Controle controle) {

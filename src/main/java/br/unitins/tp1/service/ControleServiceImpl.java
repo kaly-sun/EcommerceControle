@@ -1,10 +1,12 @@
 package br.unitins.tp1.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import br.unitins.tp1.dto.ControleDTO;
 import br.unitins.tp1.dto.ControleDTOResponse;
+import br.unitins.tp1.model.Categoria;
 import br.unitins.tp1.model.Controle;
 import br.unitins.tp1.model.EspecificacaoTecnica;
 import br.unitins.tp1.model.Marca;
@@ -41,15 +43,13 @@ public class ControleServiceImpl implements ControleService {
     @Inject
     EspecificacaoTecRepository especificacaoTecnicaRepository;
 
-
     @Override
-public List<ControleDTOResponse> findAll() {
-    return repository.listAll()
-                     .stream()
-                     .map(ControleDTOResponse::valueOf)
-                     .toList();
-}
-
+    public List<ControleDTOResponse> findAll() {
+        return repository.listAll()
+                .stream()
+                .map(ControleDTOResponse::valueOf)
+                .toList();
+    }
 
     @Override
     public List<ControleDTOResponse> getAll() {
@@ -78,10 +78,18 @@ public List<ControleDTOResponse> findAll() {
     @Override
     @Transactional
     public ControleDTOResponse create(ControleDTO dto) {
-        Controle controle = new Controle();
-        updateData(controle, dto);
-        repository.persist(controle);
-        return ControleDTOResponse.valueOf(controle);
+        try {
+            Controle controle = new Controle();
+            updateData(controle, dto);
+            repository.persist(controle);
+            return ControleDTOResponse.valueOf(controle);
+        } catch (IllegalArgumentException e) {
+            // Deixa a exception subir — o resource converte para 400 ou 404
+            throw e;
+        } catch (Exception e) {
+            // Evita erro 500 sem explicação
+            throw new IllegalArgumentException("Erro ao criar controle: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -89,7 +97,7 @@ public List<ControleDTOResponse> findAll() {
     public ControleDTOResponse update(Long id, ControleDTO dto) {
         Controle controle = repository.findById(id);
         if (controle == null)
-            return null;
+            throw new IllegalArgumentException("Controle com ID " + id + " não encontrado.");
 
         updateData(controle, dto);
         return ControleDTOResponse.valueOf(controle);
@@ -98,10 +106,16 @@ public List<ControleDTOResponse> findAll() {
     @Override
     @Transactional
     public void delete(Long id) {
-        repository.deleteById(id);
+        Controle controle = repository.findById(id);
+        if (controle == null)
+            throw new IllegalArgumentException("Controle com ID " + id + " não encontrado.");
+
+        repository.delete(controle);
     }
 
+    // 🔹 Método seguro e validado
     private void updateData(Controle controle, ControleDTO dto) {
+
         controle.setNome(dto.nome());
         controle.setPreco(dto.preco());
         controle.setCor(dto.cor());
@@ -112,25 +126,55 @@ public List<ControleDTOResponse> findAll() {
         // Marca
         if (dto.idMarca() != null) {
             Marca marca = marcaRepository.findById(dto.idMarca());
+            if (marca == null)
+                throw new IllegalArgumentException("Marca com ID " + dto.idMarca() + " não encontrada.");
             controle.setMarca(marca);
+        } else {
+            controle.setMarca(null);
         }
 
         // Plataforma
         if (dto.idPlataforma() != null) {
             Plataforma plataforma = plataformaRepository.findById(dto.idPlataforma());
+            if (plataforma == null)
+                throw new IllegalArgumentException("Plataforma com ID " + dto.idPlataforma() + " não encontrada.");
             controle.setPlataforma(plataforma);
+        } else {
+            controle.setPlataforma(null);
         }
 
         // Modelo
         if (dto.idModelo() != null) {
             Modelo modelo = modeloRepository.findById(dto.idModelo());
+            if (modelo == null)
+                throw new IllegalArgumentException("Modelo com ID " + dto.idModelo() + " não encontrado.");
             controle.setModelo(modelo);
+        } else {
+            controle.setModelo(null);
         }
 
-        // Especificação Técnica (OneToOne)
+        // Especificação Técnica
         if (dto.idEspecificacaoTecnica() != null) {
             EspecificacaoTecnica esp = especificacaoTecnicaRepository.findById(dto.idEspecificacaoTecnica());
+            if (esp == null)
+                throw new IllegalArgumentException("Especificação Técnica com ID " + dto.idEspecificacaoTecnica() + " não encontrada.");
             controle.setEspecificacaoTecnica(esp);
+        } else {
+            controle.setEspecificacaoTecnica(null);
+        }
+
+        // Categorias
+        if (controle.getCategorias() == null)
+            controle.setCategorias(new ArrayList<>());
+
+        controle.getCategorias().clear();
+        if (dto.idsCategorias() != null && !dto.idsCategorias().isEmpty()) {
+            for (Long idCategoria : dto.idsCategorias()) {
+                Categoria categoria = categoriaRepository.findById(idCategoria);
+                if (categoria == null)
+                    throw new IllegalArgumentException("Categoria com ID " + idCategoria + " não encontrada.");
+                controle.getCategorias().add(categoria);
+            }
         }
     }
 }
