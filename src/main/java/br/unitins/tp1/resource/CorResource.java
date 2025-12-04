@@ -5,6 +5,7 @@ import java.util.List;
 import br.unitins.tp1.dto.CorDTO;
 import br.unitins.tp1.dto.CorDTOResponse;
 import br.unitins.tp1.service.CorService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -18,6 +19,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/cor")
+@RolesAllowed({"ADMIN", "USER"})
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class CorResource {

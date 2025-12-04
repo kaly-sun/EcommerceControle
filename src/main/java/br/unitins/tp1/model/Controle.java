@@ -84,4 +84,27 @@ public class Controle extends DefaultEntity {
 
     public Modelo getModelo() { return modelo; }
     public void setModelo(Modelo modelo) { this.modelo = modelo; }
+
+        public void debitarEstoque(int quantidade) {
+        if (this.estoque == null) {
+            this.estoque = 0;
+        }
+
+        if (this.estoque < quantidade) {
+            throw new RuntimeException(
+                "Estoque insuficiente para o controle: " + this.nome
+            );
+        }
+
+        this.estoque -= quantidade;
+    }
+
+    public void adicionarEstoque(int quantidade) {
+        if (this.estoque == null) {
+            this.estoque = 0;
+        }
+
+        this.estoque += quantidade;
+    }
 }
+

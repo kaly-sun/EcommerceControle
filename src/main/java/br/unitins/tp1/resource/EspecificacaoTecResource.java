@@ -5,6 +5,7 @@ import java.util.List;
 import br.unitins.tp1.dto.EspecificacaoTecDTO;
 import br.unitins.tp1.dto.EspecificacaoTecDTOResponse;
 import br.unitins.tp1.service.EspecificacaoTecService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/especificacoes")
+@RolesAllowed({"ADMIN", "USER"})
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class EspecificacaoTecResource {

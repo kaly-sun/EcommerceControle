@@ -2,6 +2,8 @@ package br.unitins.tp1.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -17,19 +19,20 @@ public class Modelo extends DefaultEntity {
     private String codigoReferencia;
     private Boolean ativo;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "modelo")
     private List<Controle> controles;
 
     @ManyToOne
-@JoinColumn(name = "id_marca")
-private Marca marca;
+    @JoinColumn(name = "id_marca")
+    private Marca marca;
 
-@ManyToOne
-@JoinColumn(name = "id_plataforma")
-private Plataforma plataforma;
-
+    @ManyToOne
+    @JoinColumn(name = "id_plataforma")
+    private Plataforma plataforma;
 
     // Getters e Setters
+
     public String getNome() {
         return nome;
     }
@@ -78,5 +81,18 @@ private Plataforma plataforma;
     public void setControles(List<Controle> controles) {
         this.controles = controles;
     }
-    
+
+    public Marca getMarca() {
+        return marca;
+    }
+    public void setMarca(Marca marca) {
+        this.marca = marca;
+    }
+
+    public Plataforma getPlataforma() {
+        return plataforma;
+    }
+    public void setPlataforma(Plataforma plataforma) {
+        this.plataforma = plataforma;
+    }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import br.unitins.tp1.dto.ControleDTO;
 import br.unitins.tp1.dto.ControleDTOResponse;
 import br.unitins.tp1.service.ControleService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.Consumes;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/controles")
+@RolesAllowed({"ADMIN", "USER"})
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ControleResource {

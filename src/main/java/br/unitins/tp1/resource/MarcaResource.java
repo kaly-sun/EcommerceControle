@@ -5,6 +5,7 @@ import org.jboss.logging.Logger;
 import br.unitins.tp1.dto.MarcaDTO;
 import br.unitins.tp1.dto.MarcaDTOResponse;
 import br.unitins.tp1.service.MarcaService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -19,6 +20,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/marcas")
+@RolesAllowed({"ADMIN", "USER"})
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class MarcaResource {

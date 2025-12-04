@@ -5,6 +5,7 @@ import java.util.List;
 import br.unitins.tp1.dto.PlataformaDTO;
 import br.unitins.tp1.dto.PlataformaDTOResponse;
 import br.unitins.tp1.service.PlataformaService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -18,6 +19,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("/plataformas")
+@RolesAllowed({"ADMIN", "USER"})
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PlataformaResource {
