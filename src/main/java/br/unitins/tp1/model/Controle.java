@@ -41,7 +41,7 @@ public class Controle extends DefaultEntity {
         joinColumns = @JoinColumn(name = "id_controle"),
         inverseJoinColumns = @JoinColumn(name = "id_categoria")
     )
-    private List<Categoria> categorias = new ArrayList<>();  // ✅ CORRIGIDO – nunca mais será null
+    private List<Categoria> categorias = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_especificacao_tecnica")
@@ -51,60 +51,104 @@ public class Controle extends DefaultEntity {
     @JoinColumn(name = "id_modelo")
     private Modelo modelo;
 
-    // Getters e setters
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() {
+        return nome;
+    }
 
-    public Double getPreco() { return preco; }
-    public void setPreco(Double preco) { this.preco = preco; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-    public String getCor() { return cor; }
-    public void setCor(String cor) { this.cor = cor; }
+    public Double getPreco() {
+        return preco;
+    }
 
-    public Integer getEstoque() { return estoque; }
-    public void setEstoque(Integer estoque) { this.estoque = estoque; }
+    public void setPreco(Double preco) {
+        this.preco = preco;
+    }
 
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
+    public String getCor() {
+        return cor;
+    }
 
-    public LocalDate getDataLancamento() { return dataLancamento; }
-    public void setDataLancamento(LocalDate dataLancamento) { this.dataLancamento = dataLancamento; }
+    public void setCor(String cor) {
+        this.cor = cor;
+    }
 
-    public Marca getMarca() { return marca; }
-    public void setMarca(Marca marca) { this.marca = marca; }
+    public Integer getEstoque() {
+        return estoque;
+    }
 
-    public Plataforma getPlataforma() { return plataforma; }
-    public void setPlataforma(Plataforma plataforma) { this.plataforma = plataforma; }
-
-    public List<Categoria> getCategorias() { return categorias; }
-    public void setCategorias(List<Categoria> categorias) { this.categorias = categorias; }
-
-    public EspecificacaoTecnica getEspecificacaoTecnica() { return especificacaoTecnica; }
-    public void setEspecificacaoTecnica(EspecificacaoTecnica especificacaoTecnica) { this.especificacaoTecnica = especificacaoTecnica; }
-
-    public Modelo getModelo() { return modelo; }
-    public void setModelo(Modelo modelo) { this.modelo = modelo; }
-
-        public void debitarEstoque(int quantidade) {
-        if (this.estoque == null) {
-            this.estoque = 0;
+    public void setEstoque(Integer estoque) {
+        if (estoque < 0) {
+            throw new IllegalArgumentException("Estoque não pode ser negativo");
         }
+        this.estoque = estoque;
+    }
 
-        if (this.estoque < quantidade) {
-            throw new RuntimeException(
-                "Estoque insuficiente para o controle: " + this.nome
-            );
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public LocalDate getDataLancamento() {
+        return dataLancamento;
+    }
+
+    public void setDataLancamento(LocalDate dataLancamento) {
+        this.dataLancamento = dataLancamento;
+    }
+
+    public Marca getMarca() {
+        return marca;
+    }
+
+    public void setMarca(Marca marca) {
+        this.marca = marca;
+    }
+
+    public Plataforma getPlataforma() {
+        return plataforma;
+    }
+
+    public void setPlataforma(Plataforma plataforma) {
+        this.plataforma = plataforma;
+    }
+
+    public List<Categoria> getCategorias() {
+        return categorias;
+    }
+
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
+    }
+
+    public EspecificacaoTecnica getEspecificacaoTecnica() {
+        return especificacaoTecnica;
+    }
+
+    public void setEspecificacaoTecnica(EspecificacaoTecnica especificacaoTecnica) {
+        this.especificacaoTecnica = especificacaoTecnica;
+    }
+
+    public Modelo getModelo() {
+        return modelo;
+    }
+
+    public void setModelo(Modelo modelo) {
+        this.modelo = modelo;
+    }
+
+    public void debitarEstoque(Integer quantidade) {
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("Quantidade a ser debitada deve ser maior que zero.");
         }
-
+        if (estoque - quantidade < 0) {
+            throw new IllegalArgumentException("Estoque insuficiente.");
+        }
         this.estoque -= quantidade;
     }
-
-    public void adicionarEstoque(int quantidade) {
-        if (this.estoque == null) {
-            this.estoque = 0;
-        }
-
-        this.estoque += quantidade;
-    }
 }
-

@@ -1,22 +1,38 @@
 package br.unitins.tp1.resource;
 
-import br.unitins.tp1.dto.ModeloDTO;
-import io.quarkus.test.TestTransaction;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
-import jakarta.ws.rs.core.Response;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 
+import br.unitins.tp1.dto.MarcaDTO;
+import br.unitins.tp1.dto.ModeloDTO;
+import br.unitins.tp1.dto.PlataformaDTO;
+import br.unitins.tp1.model.Marca;
+import io.quarkus.test.TestTransaction;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import io.restassured.http.ContentType;
+import jakarta.ws.rs.core.Response;
 
 @QuarkusTest
 public class ModeloResourceTest extends BaseTest {
 
+    private static final String MARCA_PATH = "/marcas";
+    private static final String PLATAFORMA_PATH = "/plataformas";
     private static final String MODELO_PATH = "/modelos";
     private static final String MODELO_ID_PATH = MODELO_PATH + "/{id}";
 
+    Marca marca = new Marca("Sony Interactive Entertainment", "Japão", 1946,
+        "https://upload.wikimedia.org/wikipedia/commons/2/21/Sony_logo.svg",
+        "https://www.playstation.com");
+
+    
+
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     public void testGetAll() {
         given()
             .when().get(MODELO_PATH)
@@ -26,6 +42,7 @@ public class ModeloResourceTest extends BaseTest {
     }
 
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     public void testFindByIdNotFound() {
         given()
             .when().get(MODELO_ID_PATH, 9999)
@@ -33,109 +50,242 @@ public class ModeloResourceTest extends BaseTest {
                 .statusCode(Response.Status.NOT_FOUND.getStatusCode());
     }
 
-    @Test
-    @TestTransaction
-    public void testCreateModelo() {
+@Test
+@TestTransaction
+@TestSecurity(user = "test-admin", roles = "ADMIN")
+public void testCreateModelo() {
 
-        ModeloDTO dto = new ModeloDTO(
-                "DualSense",
-                "CFI-ZCT1W",
-                2020,
-                "Controle do PlayStation 5",
-                "DS-PS5-001",
-                true
-        );
+    MarcaDTO marcaDTO = new MarcaDTO(
+        "Sony Interactive Entertainment",
+        "Japão",
+        1946,
+        "https://upload.wikimedia.org/wikipedia/commons/2/21/Sony_logo.svg",
+        "https://www.playstation.com"
+    );
 
+    Long marcaId =
+        given()
+            .contentType(ContentType.JSON)
+            .body(marcaDTO)
+        .when()
+            .post(MARCA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
+
+    assertNotNull(marcaId);
+
+    PlataformaDTO plataformaDTO = new PlataformaDTO(
+        "PlayStation 4",
+        "Sony",
+        "8ª Geração",
+        2013,
+        "Console"
+    );
+
+    Long plataformaId =
+        given()
+            .contentType(ContentType.JSON)
+            .body(plataformaDTO)
+        .when()
+            .post(PLATAFORMA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
+
+    assertNotNull(plataformaId);
+
+    ModeloDTO dto = new ModeloDTO(
+        "DualSense",
+        "v1",
+        2020,
+        "Controle oficial do PlayStation 5",
+        "CFI-ZCT1W",
+        true,
+        marcaId,
+        plataformaId
+    );
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(dto)
+    .when()
+        .post(MODELO_PATH)
+    .then()
+        .statusCode(Response.Status.OK.getStatusCode())
+        .body("id", notNullValue())
+        .body("nome", is("DualSense"));
+}
+
+
+
+ @Test
+@TestTransaction
+@TestSecurity(user = "test-admin", roles = "ADMIN")
+public void testUpdateModelo() {
+
+    Long marcaId =
+        given()
+            .contentType(ContentType.JSON)
+            .body(new MarcaDTO(
+                "Sony",
+                "Japão",
+                1946,
+                "https://www.sony.com",
+                "sony.png"
+            ))
+        .when()
+            .post(MARCA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
+
+    Long plataformaId =
+        given()
+            .contentType(ContentType.JSON)
+            .body(new PlataformaDTO(
+                "PlayStation 4",
+                "Sony",
+                "8ª Geração",
+                2013,
+                "Console"
+            ))
+        .when()
+            .post(PLATAFORMA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
+
+    ModeloDTO dto = new ModeloDTO(
+        "DualShock 4",
+        "v2",
+        2013,
+        "Controle oficial do PlayStation 4",
+        "CUH-ZCT2",
+        true,
+        marcaId,
+        plataformaId
+    );
+
+    Long idCriado =
         given()
             .contentType(ContentType.JSON)
             .body(dto)
-            .when().post(MODELO_PATH)
-            .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .body("id", notNullValue())
-                .body("nome", is("DualSense"))
-                .body("versao", is("CFI-ZCT1W"))
-                .body("anoLancamento", is(2020))
-                .body("descricao", is("Controle do PlayStation 5"))
-                .body("codigoReferencia", is("DS-PS5-001"))
-                .body("ativo", is(true));
-    }
+        .when()
+            .post(MODELO_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
 
-    @Test
-    @TestTransaction
-    public void testUpdateModelo() {
+    ModeloDTO atualizado = new ModeloDTO(
+        "DualShock 4",
+        "v3",
+        2014,
+        "Controle atualizado do PlayStation 4",
+        "CUH-ZCT2-REV",
+        false,
+        marcaId,
+        plataformaId
+    );
 
-        ModeloDTO dto = new ModeloDTO(
-                "DualShock 4",
-                "CUH-ZCT2",
-                2016,
-                "Controle do PlayStation 4",
-                "DS4-PS4-001",
-                true
-        );
+    given()
+        .contentType(ContentType.JSON)
+        .body(atualizado)
+        .pathParam("id", idCriado)
+    .when()
+        .put(MODELO_ID_PATH)
+    .then()
+        .statusCode(Response.Status.OK.getStatusCode())
+        .body("versao", is("v3"))
+        .body("ativo", is(false));
+}
 
-        Long idCriado = given()
-                .contentType(ContentType.JSON)
-                .body(dto)
-                .when().post(MODELO_PATH)
-                .then()
-                    .extract().jsonPath().getLong("id");
+@Test
+@TestTransaction
+@TestSecurity(user = "test-admin", roles = "ADMIN")
+public void testDeleteModelo() {
 
-        ModeloDTO atualizado = new ModeloDTO(
-                "DualShock 4 Pro",
-                "CUH-ZCT2-PRO",
-                2017,
-                "Versão atualizada com mais precisão",
-                "DS4-PS4-777",
-                false
-        );
-
+    Long marcaId =
         given()
             .contentType(ContentType.JSON)
-            .body(atualizado)
-            .pathParam("id", idCriado)
-            .when().put(MODELO_ID_PATH)
-            .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .body("id", equalTo(idCriado.intValue()))
-                .body("nome", is("DualShock 4 Pro"))
-                .body("versao", is("CUH-ZCT2-PRO"))
-                .body("anoLancamento", is(2017))
-                .body("descricao", is("Versão atualizada com mais precisão"))
-                .body("codigoReferencia", is("DS4-PS4-777"))
-                .body("ativo", is(false));
-    }
+            .body(new MarcaDTO(
+                "Sony",
+                "Japão",
+                1946,
+                "https://sony.com",
+                "sony.png"
+            ))
+        .when()
+            .post(MARCA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
 
-    @Test
-    @TestTransaction
-    public void testDeleteModelo() {
-
-        ModeloDTO dto = new ModeloDTO(
-                "Xbox Elite Controller",
-                "Series 2",
-                2019,
-                "Controle premium para Xbox",
-                "XELITE-2",
-                true
-        );
-
-        Long idCriado = given()
-                .contentType(ContentType.JSON)
-                .body(dto)
-                .when().post(MODELO_PATH)
-                .then()
-                    .extract().jsonPath().getLong("id");
-
+    Long plataformaId =
         given()
-            .pathParam("id", idCriado)
-            .when().delete(MODELO_ID_PATH)
-            .then()
-                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+            .contentType(ContentType.JSON)
+            .body(new PlataformaDTO(
+                "PlayStation 4",
+                "Sony",
+                "8ª Geração",
+                2013,
+                "Console"
+            ))
+        .when()
+            .post(PLATAFORMA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
 
+    ModeloDTO dto = new ModeloDTO(
+        "Modelo Teste Delete",
+        "v1",
+        2022,
+        "Modelo temporário",
+        "TMP-001",
+        true,
+        marcaId,
+        plataformaId
+    );
+
+    Long idCriado =
         given()
-            .pathParam("id", idCriado)
-            .when().get(MODELO_ID_PATH)
-            .then()
-                .statusCode(Response.Status.NOT_FOUND.getStatusCode());
-    }
+            .contentType(ContentType.JSON)
+            .body(dto)
+        .when()
+            .post(MODELO_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .extract()
+            .jsonPath()
+            .getLong("id");
+
+    given()
+        .pathParam("id", idCriado)
+    .when()
+        .delete(MODELO_ID_PATH)
+    .then()
+        .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+
+    given()
+        .pathParam("id", idCriado)
+    .when()
+        .get(MODELO_ID_PATH)
+    .then()
+        .statusCode(Response.Status.NOT_FOUND.getStatusCode());
 }
+        } 

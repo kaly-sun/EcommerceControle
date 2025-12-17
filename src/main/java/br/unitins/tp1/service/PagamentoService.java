@@ -1,23 +1,14 @@
 package br.unitins.tp1.service;
 
-import br.unitins.tp1.dto.PagamentoDTO;
-import br.unitins.tp1.dto.PagamentoDTOResponse;
-import br.unitins.tp1.model.Pagamento;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 
-@ApplicationScoped
-public class PagamentoService {
+import br.unitins.tp1.dto.PagamentoResponseDTO;
 
-    @Transactional
-    public PagamentoDTOResponse pagar(PagamentoDTO dto) {
+public interface PagamentoService {
 
-        Pagamento pagamento = new Pagamento();
-        pagamento.setFormaPagamento(dto.formaPagamento());
-        pagamento.setValorTotal(dto.valorTotal());
-        pagamento.setConfirmado(true); // simulação de pagamento processado
+    PagamentoResponseDTO findByIdSeguro(Long idPagamento, Long idUsuarioToken, boolean isAdmin);
 
+    PagamentoResponseDTO gerarPixParaPedidoSeguro(Long idPedido, Long idUsuarioToken, boolean isAdmin);
 
-        return PagamentoDTOResponse.valueOf(pagamento);
-    }
+    void solicitarConfirmacao(Long idPagamento, Long idUsuarioToken);
+
 }

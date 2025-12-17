@@ -1,34 +1,85 @@
 package br.unitins.tp1.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Pagamento {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
-    private Long id;
-    private FormaPagamento formaPagamento;
-    private Double valorTotal;
-    private LocalDateTime dataPagamento;
-    private Boolean confirmado;
+@Entity
+@Table(name = "pagamento")
+public class Pagamento extends DefaultEntity {
 
-    public Pagamento() {
-        this.dataPagamento = LocalDateTime.now();
-        this.confirmado = false;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_id", nullable = false)
+    private Pedido pedido;
+
+
+    @Column(name = "metodo_pagamento", length = 30, nullable = false)
+    private String metodoPagamento;
+
+
+    @Column(name = "status", length = 30)
+    private String status;
+
+
+    @Column(name = "valor", precision = 19, scale = 4, nullable = false)
+    private BigDecimal valor;
+
+
+    @Column(name = "codigo_pagamento", columnDefinition = "text")
+    private String codigoPagamento;
+
+    @Column(name = "data_criacao")
+    private LocalDateTime dataCriacao;
+
+    @Column(name = "ultimos4", length = 4)
+private String ultimos4;
+
+@Column(name = "bandeira")
+private String bandeira;
+
+public String getUltimos4() { return ultimos4; }
+public void setUltimos4(String ultimos4) { this.ultimos4 = ultimos4; }
+
+public String getBandeira() { return bandeira; }
+public void setBandeira(String bandeira) { this.bandeira = bandeira; }
+
+
+    @PrePersist
+    public void prePersist() {
+        if (dataCriacao == null)
+            dataCriacao = LocalDateTime.now();
     }
 
-    // Getters e Setters
+    // GETTERS / SETTERS
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Pedido getPedido() { return pedido; }
+    public void setPedido(Pedido pedido) { this.pedido = pedido; }
 
-    public FormaPagamento getFormaPagamento() { return formaPagamento; }
-    public void setFormaPagamento(FormaPagamento formaPagamento) { this.formaPagamento = formaPagamento; }
+    public String getMetodoPagamento() { return metodoPagamento; }
+    public void setMetodoPagamento(String metodoPagamento) {
+        this.metodoPagamento = metodoPagamento;
+    }
 
-    public Double getValorTotal() { return valorTotal; }
-    public void setValorTotal(Double valorTotal) { this.valorTotal = valorTotal; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public LocalDateTime getDataPagamento() { return dataPagamento; }
-    public void setDataPagamento(LocalDateTime dataPagamento) { this.dataPagamento = dataPagamento; }
+    public BigDecimal getValor() { return valor; }
+    public void setValor(BigDecimal valor) { this.valor = valor; }
 
-    public Boolean getConfirmado() { return confirmado; }
-    public void setConfirmado(Boolean confirmado) { this.confirmado = confirmado; }
+    public String getCodigoPagamento() { return codigoPagamento; }
+    public void setCodigoPagamento(String codigoPagamento) {
+        this.codigoPagamento = codigoPagamento;
+    }
+
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
 }

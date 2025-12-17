@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import br.unitins.tp1.dto.CategoriaDTO;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
 
@@ -21,119 +22,111 @@ public class CategoriaResourceTest extends BaseTest {
     private static final String CATEGORY_SEARCH_PATH = CATEGORY_PATH + "/search/{nome}";
 
     @Test
+    @TestSecurity(user = "user", roles = {"USER"})
     public void testGetAll() {
         given()
             .when().get(CATEGORY_PATH)
             .then()
                 .statusCode(200)
-                .body("size()", greaterThanOrEqualTo(0));
+                .body("size()", greaterThanOrEqualTo(4));
     }
 
     @Test
+    @TestSecurity(user = "user", roles = {"USER"})
     public void testFindByIdNotFound() {
         given()
             .when().get(CATEGORY_ID_PATH, 9999)
             .then()
-                .statusCode(204); // ✅ Seu backend retorna NO_CONTENT quando não acha
+                .statusCode(204);
     }
 
     @Test
+    @TestSecurity(user = "admin", roles = {"ADMIN"})
     @TestTransaction
     public void testCreateCategoria() {
 
-        CategoriaDTO dto = new CategoriaDTO("Edição Limitada PS5");
+        CategoriaDTO dto = new CategoriaDTO("Nova Categoria");
 
         given()
             .contentType(ContentType.JSON)
             .body(dto)
-            .when().post(CATEGORY_PATH)
-            .then()
-                .statusCode(200) // ✅ seu POST retorna OK, não CREATED
-                .body("id", notNullValue())
-                .body("nome", is("Edição Limitada PS5"));
+        .when()
+            .post(CATEGORY_PATH)
+        .then()
+            .statusCode(200)
+            .body("id", notNullValue())
+            .body("nome", is("Nova Categoria"));
     }
 
     @Test
+    @TestSecurity(user = "admin", roles = {"ADMIN"})
     @TestTransaction
     public void testUpdateCategoria() {
 
-        Long idCriado = 
+        Long idCriado =
             given()
                 .contentType(ContentType.JSON)
-                .body(new CategoriaDTO("Controle Xbox Série X"))
-                .when().post(CATEGORY_PATH)
-                .then()
-                    .statusCode(200) // ✅ POST retorna 200
-                    .extract().jsonPath().getLong("id");
+                .body(new CategoriaDTO("Categoria Teste"))
+            .when()
+                .post(CATEGORY_PATH)
+            .then()
+                .extract().jsonPath().getLong("id");
 
-        CategoriaDTO dtoUpdate = new CategoriaDTO("Controle Xbox Série X - Edição Elite");
+        CategoriaDTO dtoUpdate = new CategoriaDTO("Categoria Atualizada");
 
         given()
             .contentType(ContentType.JSON)
             .body(dtoUpdate)
             .pathParam("id", idCriado)
-            .when().put(CATEGORY_ID_PATH)
-            .then()
-                .statusCode(200)
-                .body("id", equalTo(idCriado.intValue()))
-                .body("nome", is("Controle Xbox Série X - Edição Elite"));
+        .when()
+            .put(CATEGORY_ID_PATH)
+        .then()
+            .statusCode(200)
+            .body("id", equalTo(idCriado.intValue()))
+            .body("nome", is("Categoria Atualizada"));
     }
 
     @Test
+    @TestSecurity(user = "admin", roles = {"ADMIN"})
     @TestTransaction
     public void testDeleteCategoria() {
 
         Long idCriado =
             given()
                 .contentType(ContentType.JSON)
-                .body(new CategoriaDTO("Controle Temático Star Wars"))
-                .when().post(CATEGORY_PATH)
-                .then()
-                    .statusCode(200) // ✅ POST retorna 200
-                    .extract().jsonPath().getLong("id");
+                .body(new CategoriaDTO("Categoria Remover"))
+            .when()
+                .post(CATEGORY_PATH)
+            .then()
+                .extract().jsonPath().getLong("id");
 
-        // Deletar
         given()
             .pathParam("id", idCriado)
-            .when().delete(CATEGORY_ID_PATH)
-            .then()
-                .statusCode(204); // ✅ seu DELETE retorna NO_CONTENT
+        .when()
+            .delete(CATEGORY_ID_PATH)
+        .then()
+            .statusCode(204);
 
-        // Validar que foi deletada
         given()
             .pathParam("id", idCriado)
-            .when().get(CATEGORY_ID_PATH)
-            .then()
-                .statusCode(204); // ✅ conforme seu backend
+        .when()
+            .get(CATEGORY_ID_PATH)
+        .then()
+            .statusCode(204);
     }
 
     @Test
+    @TestSecurity(user = "admin", roles = {"ADMIN"})
     @TestTransaction
     public void testFindByNome() {
 
-        // cria 1
         given()
-            .contentType(ContentType.JSON)
-            .body(new CategoriaDTO("Edição Limitada God of War"))
-            .when().post(CATEGORY_PATH)
-            .then()
-                .statusCode(200); // ✅
-
-        // cria 2
-        given()
-            .contentType(ContentType.JSON)
-            .body(new CategoriaDTO("Edição Limitada Spider-Man"))
-            .when().post(CATEGORY_PATH)
-            .then()
-                .statusCode(200); // ✅
-
-        // pesquisa
-        given()
-            .pathParam("nome", "Edição Limitada")
-            .when().get(CATEGORY_SEARCH_PATH)
-            .then()
-                .statusCode(200)
-                .body("size()", greaterThanOrEqualTo(2))
-                .body("[0].nome", containsString("Edição Limitada"));
+            .pathParam("nome", "Edição")
+        .when()
+            .get(CATEGORY_SEARCH_PATH)
+        .then()
+            .statusCode(200)
+            .body("size()", greaterThanOrEqualTo(2))
+            .body("[0].nome", containsString("Edição"));
     }
 }

@@ -4,35 +4,48 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "modelo")
 public class Modelo extends DefaultEntity {
 
+    @Column(length = 255, nullable = false)
     private String nome;
+
+    @Column(length = 255, nullable = false)
     private String versao;
+
+    @Column(name = "anolancamento", nullable = false)
     private Integer anoLancamento;
+
+    @Column(length = 255, nullable = false)
     private String descricao;
+
+    @Column(name = "codigoreferencia", length = 255, nullable = false)
     private String codigoReferencia;
+
+    @Column(nullable = false)
     private Boolean ativo;
 
     @JsonIgnore
     @OneToMany(mappedBy = "modelo")
     private List<Controle> controles;
 
-    @ManyToOne
-    @JoinColumn(name = "id_marca")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_marca", nullable = false)
     private Marca marca;
 
-    @ManyToOne
-    @JoinColumn(name = "id_plataforma")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_plataforma", nullable = false)
     private Plataforma plataforma;
 
-    // Getters e Setters
-
+    // getters e setters
     public String getNome() {
         return nome;
     }

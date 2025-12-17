@@ -76,20 +76,20 @@ public class ControleServiceImpl implements ControleService {
     }
 
     @Override
+    public List<ControleDTOResponse> findByCategoria(String nome) {
+        return repository.findByCategoria(nome)
+                .stream()
+                .map(ControleDTOResponse::valueOf)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public ControleDTOResponse create(ControleDTO dto) {
-        try {
-            Controle controle = new Controle();
-            updateData(controle, dto);
-            repository.persist(controle);
-            return ControleDTOResponse.valueOf(controle);
-        } catch (IllegalArgumentException e) {
-            // Deixa a exception subir — o resource converte para 400 ou 404
-            throw e;
-        } catch (Exception e) {
-            // Evita erro 500 sem explicação
-            throw new IllegalArgumentException("Erro ao criar controle: " + e.getMessage(), e);
-        }
+        Controle controle = new Controle();
+        updateData(controle, dto);
+        repository.persist(controle);
+        return ControleDTOResponse.valueOf(controle);
     }
 
     @Override
@@ -98,7 +98,6 @@ public class ControleServiceImpl implements ControleService {
         Controle controle = repository.findById(id);
         if (controle == null)
             throw new IllegalArgumentException("Controle com ID " + id + " não encontrado.");
-
         updateData(controle, dto);
         return ControleDTOResponse.valueOf(controle);
     }
@@ -109,11 +108,9 @@ public class ControleServiceImpl implements ControleService {
         Controle controle = repository.findById(id);
         if (controle == null)
             throw new IllegalArgumentException("Controle com ID " + id + " não encontrado.");
-
         repository.delete(controle);
     }
 
-    // 🔹 Método seguro e validado
     private void updateData(Controle controle, ControleDTO dto) {
 
         controle.setNome(dto.nome());
@@ -123,56 +120,52 @@ public class ControleServiceImpl implements ControleService {
         controle.setDescricao(dto.descricao());
         controle.setDataLancamento(dto.dataLancamento());
 
-        // Marca
         if (dto.idMarca() != null) {
             Marca marca = marcaRepository.findById(dto.idMarca());
             if (marca == null)
-                throw new IllegalArgumentException("Marca com ID " + dto.idMarca() + " não encontrada.");
+                throw new IllegalArgumentException("Marca não encontrada.");
             controle.setMarca(marca);
         } else {
             controle.setMarca(null);
         }
 
-        // Plataforma
         if (dto.idPlataforma() != null) {
             Plataforma plataforma = plataformaRepository.findById(dto.idPlataforma());
             if (plataforma == null)
-                throw new IllegalArgumentException("Plataforma com ID " + dto.idPlataforma() + " não encontrada.");
+                throw new IllegalArgumentException("Plataforma não encontrada.");
             controle.setPlataforma(plataforma);
         } else {
             controle.setPlataforma(null);
         }
 
-        // Modelo
         if (dto.idModelo() != null) {
             Modelo modelo = modeloRepository.findById(dto.idModelo());
             if (modelo == null)
-                throw new IllegalArgumentException("Modelo com ID " + dto.idModelo() + " não encontrado.");
+                throw new IllegalArgumentException("Modelo não encontrado.");
             controle.setModelo(modelo);
         } else {
             controle.setModelo(null);
         }
 
-        // Especificação Técnica
         if (dto.idEspecificacaoTecnica() != null) {
             EspecificacaoTecnica esp = especificacaoTecnicaRepository.findById(dto.idEspecificacaoTecnica());
             if (esp == null)
-                throw new IllegalArgumentException("Especificação Técnica com ID " + dto.idEspecificacaoTecnica() + " não encontrada.");
+                throw new IllegalArgumentException("Especificação técnica não encontrada.");
             controle.setEspecificacaoTecnica(esp);
         } else {
             controle.setEspecificacaoTecnica(null);
         }
 
-        // Categorias
         if (controle.getCategorias() == null)
             controle.setCategorias(new ArrayList<>());
 
         controle.getCategorias().clear();
-        if (dto.idsCategorias() != null && !dto.idsCategorias().isEmpty()) {
+
+        if (dto.idsCategorias() != null) {
             for (Long idCategoria : dto.idsCategorias()) {
                 Categoria categoria = categoriaRepository.findById(idCategoria);
                 if (categoria == null)
-                    throw new IllegalArgumentException("Categoria com ID " + idCategoria + " não encontrada.");
+                    throw new IllegalArgumentException("Categoria não encontrada.");
                 controle.getCategorias().add(categoria);
             }
         }

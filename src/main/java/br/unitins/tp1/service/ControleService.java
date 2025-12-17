@@ -20,4 +20,6 @@ public interface ControleService {
     List<ControleDTOResponse> findAll();
 
     List<ControleDTOResponse> findByNome(String nome);
+
+    List<ControleDTOResponse> findByCategoria(String nome);
 }

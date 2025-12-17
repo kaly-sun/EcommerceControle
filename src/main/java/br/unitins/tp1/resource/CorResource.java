@@ -7,6 +7,7 @@ import br.unitins.tp1.dto.CorDTOResponse;
 import br.unitins.tp1.service.CorService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -28,48 +29,58 @@ public class CorResource {
     CorService service;
 
     @POST
+    @Transactional
     public Response insert(CorDTO dto) {
         CorDTOResponse response = service.insert(dto);
-        return Response.ok(response).build(); // Teste deve esperar 200
+        return Response.ok(response).build(); // 200
     }
 
     @PUT
     @Path("/{id}")
+    @Transactional
     public Response update(@PathParam("id") Long id, CorDTO dto) {
+
         CorDTOResponse response = service.update(id, dto);
 
-        if (response == null)
+        if (response == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
 
-        return Response.ok(response).build();
+        return Response.ok(response).build(); // 200
     }
 
-    @DELETE
-    @Path("/{id}")
-    public Response delete(@PathParam("id") Long id) {
+@DELETE
+@Path("/{id}")
+@Transactional
+public Response delete(@PathParam("id") Long id) {
 
-        CorDTOResponse existente = service.findById(id);
-        if (existente == null)
-            return Response.status(Response.Status.NOT_FOUND).build();
+    CorDTOResponse existente = service.findById(id);
 
-        service.delete(id);
-        return Response.noContent().build(); // 204
+    if (existente == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
+
+    service.delete(id);
+
+    return Response.noContent().build();
+}
 
     @GET
     @Path("/{id}")
     public Response findById(@PathParam("id") Long id) {
+
         CorDTOResponse dto = service.findById(id);
 
-        if (dto == null)
+        if (dto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
 
-        return Response.ok(dto).build();
+        return Response.ok(dto).build(); 
     }
 
     @GET
     public Response findAll() {
         List<CorDTOResponse> list = service.findAll();
-        return Response.ok(list).build();
+        return Response.ok(list).build(); 
     }
 }

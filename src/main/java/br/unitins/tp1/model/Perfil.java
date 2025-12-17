@@ -1,22 +1,46 @@
 package br.unitins.tp1.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Perfil {
-    ADMIN(1, "Administrador"),
-    USER(2, "Usuário");
 
-    private final Integer id;
-    private final String label;
+    ADM(1, "Adm"),
+    USER(2, "User");
 
-    Perfil(Integer id, String label) {
-        this.id = id;
-        this.label = label;
+    private final int ID;
+    private final String NAME;
+
+    Perfil(int id, String name){
+        this.ID = id;
+        this.NAME = name;
     }
 
-    public Integer getId() {
-        return id;
+    public int getID() {
+        return ID;
     }
 
-    public String getLabel() {
-        return label;
+    public String getNAME() {
+        return NAME;
     }
+
+    public static Perfil valueOf(Integer id){
+
+        if (id == null){
+            return null;
+        }
+
+        for (Perfil r : Perfil.values()){
+
+            if (r.getID() == id){
+                return r;
+            }
+
+        }
+
+        return null;
+
+    }
+
 }
+

@@ -22,12 +22,10 @@ public class Marca extends DefaultEntity {
 
     private String siteOficial;
 
-    // URL ou caminho da imagem
     private String logo;
 
-    // Relacionamento opcional (lado inverso) - apenas se quiser listar controles a partir da marca
     @OneToMany(mappedBy = "marca")
-    @JsonIgnore // evita recursão infinita no JSON
+    @JsonIgnore 
     private List<Controle> controles;
 
     public Marca() {}
@@ -40,7 +38,6 @@ public class Marca extends DefaultEntity {
         this.logo = logo;
     }
 
-    // Getters e Setters
     public String getNome() {
         return nome;
     }

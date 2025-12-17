@@ -33,24 +33,12 @@ public class ControleResource {
         try {
             ControleDTOResponse response = service.create(dto);
             return Response.status(Response.Status.CREATED).entity(response).build();
-
         } catch (IllegalArgumentException e) {
-            // Dados inválidos (ex: id inexistente)
-            return Response.status(Response.Status.BAD_REQUEST)
-                           .entity("Erro: " + e.getMessage())
-                           .build();
-
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (PersistenceException e) {
-            // Erro de banco (ex: violação de chave estrangeira)
-            return Response.status(Response.Status.CONFLICT)
-                           .entity("Erro ao salvar controle: violação de integridade.")
-                           .build();
-
+            return Response.status(Response.Status.CONFLICT).build();
         } catch (Exception e) {
-            // Qualquer erro inesperado
-            return Response.serverError()
-                           .entity("Erro interno ao criar controle.")
-                           .build();
+            return Response.serverError().build();
         }
     }
 
@@ -61,23 +49,13 @@ public class ControleResource {
             ControleDTOResponse response = service.update(id, dto);
             if (response == null)
                 return Response.status(Response.Status.NOT_FOUND).build();
-
             return Response.ok(response).build();
-
         } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                           .entity("Erro: " + e.getMessage())
-                           .build();
-
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (PersistenceException e) {
-            return Response.status(Response.Status.CONFLICT)
-                           .entity("Erro ao atualizar controle: violação de integridade.")
-                           .build();
-
+            return Response.status(Response.Status.CONFLICT).build();
         } catch (Exception e) {
-            return Response.serverError()
-                           .entity("Erro interno ao atualizar controle.")
-                           .build();
+            return Response.serverError().build();
         }
     }
 
@@ -87,16 +65,10 @@ public class ControleResource {
         try {
             service.delete(id);
             return Response.noContent().build();
-
         } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.NOT_FOUND)
-                           .entity("Erro: " + e.getMessage())
-                           .build();
-
+            return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
-            return Response.serverError()
-                           .entity("Erro interno ao deletar controle.")
-                           .build();
+            return Response.serverError().build();
         }
     }
 
@@ -106,20 +78,26 @@ public class ControleResource {
         ControleDTOResponse response = service.findById(id);
         if (response == null)
             return Response.status(Response.Status.NOT_FOUND).build();
-
         return Response.ok(response).build();
     }
 
     @GET
     public Response findAll() {
         List<ControleDTOResponse> list = service.findAll();
-        return Response.ok(list).build(); // ✅ sempre retorna 200 mesmo que a lista esteja vazia
+        return Response.ok(list).build();
     }
 
     @GET
-    @Path("/search/{nome}")
+    @Path("/search/nome/{nome}")
     public Response findByNome(@PathParam("nome") String nome) {
         List<ControleDTOResponse> list = service.findByNome(nome);
-        return Response.ok(list).build(); // ✅ mesmo comportamento estável
+        return Response.ok(list).build();
+    }
+
+    @GET
+    @Path("/search/categoria/{nome}")
+    public Response findByCategoria(@PathParam("nome") String nome) {
+        List<ControleDTOResponse> list = service.findByCategoria(nome);
+        return Response.ok(list).build();
     }
 }

@@ -22,12 +22,10 @@ public class MarcaDTOResponse {
         this.logo = marca.getLogo();
     }
 
-    // ✅ Método auxiliar estático
     public static MarcaDTOResponse valueOf(Marca marca) {
         return new MarcaDTOResponse(marca);
     }
 
-    // ✅ Getters e Setters
     public Long getId() {
         return id;
     }

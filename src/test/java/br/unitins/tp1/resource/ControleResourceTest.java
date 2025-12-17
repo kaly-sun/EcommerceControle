@@ -19,6 +19,7 @@ import br.unitins.tp1.dto.ModeloDTO;
 import br.unitins.tp1.dto.PlataformaDTO;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
@@ -26,26 +27,27 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 @QuarkusTest
+@TestSecurity(user = "admin", roles = {"ADMIN"})
 public class ControleResourceTest {
 
     private static final String CONTROLE_PATH = "/controles";
     private static final String CONTROLE_ID_PATH = "/controles/{id}";
 
-    // ✅ Injeta o EntityManager para manipular o banco diretamente
     @Inject
     EntityManager em;
 
-    // 🔹 Limpa o banco antes de cada teste
-    @BeforeEach
-    @Transactional
-    public void limparBanco() {
-        em.createQuery("DELETE FROM Controle").executeUpdate();
-        em.createQuery("DELETE FROM Categoria").executeUpdate();
-        em.createQuery("DELETE FROM Modelo").executeUpdate();
-        em.createQuery("DELETE FROM Plataforma").executeUpdate();
-        em.createQuery("DELETE FROM Marca").executeUpdate();
-        em.createQuery("DELETE FROM EspecificacaoTecnica").executeUpdate();
-    }
+@BeforeEach
+@Transactional
+public void limparBanco() {
+    em.createNativeQuery("DELETE FROM controle_categoria").executeUpdate();
+
+    em.createQuery("DELETE FROM Controle").executeUpdate();
+    em.createQuery("DELETE FROM Categoria").executeUpdate();
+    em.createQuery("DELETE FROM Modelo").executeUpdate();
+    em.createQuery("DELETE FROM Plataforma").executeUpdate();
+    em.createQuery("DELETE FROM Marca").executeUpdate();
+    em.createQuery("DELETE FROM EspecificacaoTecnica").executeUpdate();
+}
 
     private Long criarMarca() {
         return given()
@@ -67,21 +69,43 @@ public class ControleResourceTest {
             .extract().jsonPath().getLong("id");
     }
 
-    private Long criarModelo() {
-        return given()
-            .contentType(ContentType.JSON)
-            .body(new ModeloDTO("DualSense", "V1", 2021, "Controle PS5", "DS01", true))
-            .when().post("/modelos")
-            .then()
+    private Long criarModelo(Long idMarca, Long idPlataforma) {
+    return given()
+        .contentType(ContentType.JSON)
+        .body(new ModeloDTO(
+            "DualSense",
+            "V1",
+            2021,
+            "Controle PS5",
+            "DS01",
+            true,
+            idMarca,
+            idPlataforma
+        ))
+        .when().post("/modelos")
+        .then()
             .statusCode(anyOf(is(200), is(201)))
             .extract().jsonPath().getLong("id");
-    }
+}
+
+private Long criarModelo() {
+    Long idMarca = criarMarca();
+    Long idPlataforma = criarPlataforma();
+    return criarModelo(idMarca, idPlataforma);
+}
+
 
     private Long criarEspecificacao() {
         return given()
             .contentType(ContentType.JSON)
-            .body(new EspecificacaoTecDTO(280.0, "Plástico ABS", 12, "Bluetooth 5.1",
-                    "16x10x6 cm", "Giroscópio"))
+            .body(new EspecificacaoTecDTO(
+                280.0,
+                "Plástico ABS",
+                12,
+                "Bluetooth 5.1",
+                "16x10x6 cm",
+                "Giroscópio"
+            ))
             .when().post("/especificacoes")
             .then()
             .statusCode(anyOf(is(200), is(201)))
@@ -133,7 +157,6 @@ public class ControleResourceTest {
     @Test
     @TestTransaction
     public void testCreate() {
-
         ControleDTO dto = criarDTOValido("Controle Azul");
 
         given()
@@ -144,13 +167,12 @@ public class ControleResourceTest {
             .statusCode(anyOf(is(200), is(201)))
             .body("id", notNullValue())
             .body("nome", is("Controle Azul"))
-            .body("cor", is("Azul"));
+            .body("categorias.size()", is(2));
     }
 
     @Test
     @TestTransaction
     public void testFindById() {
-
         Long id =
             given()
                 .contentType(ContentType.JSON)
@@ -171,7 +193,6 @@ public class ControleResourceTest {
     @Test
     @TestTransaction
     public void testUpdate() {
-
         Long id =
             given()
                 .contentType(ContentType.JSON)
@@ -195,7 +216,6 @@ public class ControleResourceTest {
     @Test
     @TestTransaction
     public void testDelete() {
-
         Long id =
             given()
                 .contentType(ContentType.JSON)

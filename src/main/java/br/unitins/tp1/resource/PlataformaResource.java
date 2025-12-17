@@ -28,51 +28,54 @@ public class PlataformaResource {
     PlataformaService service;
 
     @GET
-    public List<PlataformaDTOResponse> getAll() {
-        return service.getAll();
+    public Response getAll() {
+        List<PlataformaDTOResponse> lista = service.getAll();
+        return Response.ok(lista).build();
     }
 
     @GET
     @Path("/{id}")
     public Response findById(@PathParam("id") Long id) {
         PlataformaDTOResponse response = service.findById(id);
-
-        if (response == null)
+        if (response == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
-
+        }
         return Response.ok(response).build();
     }
 
     @GET
     @Path("/search/{nome}")
-    public List<PlataformaDTOResponse> findByNome(@PathParam("nome") String nome) {
-        return service.findByNome(nome);
+    public Response findByNome(@PathParam("nome") String nome) {
+        List<PlataformaDTOResponse> lista = service.findByNome(nome);
+        return Response.ok(lista).build();
     }
 
     @POST
     public Response create(PlataformaDTO dto) {
+        if (dto == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         PlataformaDTOResponse response = service.create(dto);
-
-        // ✅ Teste espera 200, não 201
         return Response.ok(response).build();
     }
 
     @PUT
     @Path("/{id}")
     public Response update(@PathParam("id") Long id, PlataformaDTO dto) {
+        if (dto == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         PlataformaDTOResponse response = service.update(id, dto);
-
-        if (response == null)
+        if (response == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
-
-        return Response.ok(response).build(); // ✅ Teste espera 200
+        }
+        return Response.ok(response).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") Long id) {
         service.delete(id);
-
-        return Response.status(Response.Status.NO_CONTENT).build(); // ✅ Teste espera 204
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import br.unitins.tp1.dto.MarcaDTO;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
 import jakarta.ws.rs.core.Response;
@@ -22,23 +23,28 @@ public class MarcaResourceTest extends BaseTest {
     private static final String MARCA_SEARCH_PATH = MARCA_PATH + "/search/{nome}";
 
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     public void testGetAll() {
         given()
-            .when().get(MARCA_PATH)
-            .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .body("size()", greaterThanOrEqualTo(0));
+        .when()
+            .get(MARCA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .body("size()", greaterThanOrEqualTo(0));
     }
 
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     public void testFindByIdNotFound() {
         given()
-            .when().get(MARCA_ID_PATH, 9999)
-            .then()
-                .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+        .when()
+            .get(MARCA_ID_PATH, 9999)
+        .then()
+            .statusCode(Response.Status.NOT_FOUND.getStatusCode());
     }
 
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     @TestTransaction
     public void testCreateMarca() {
 
@@ -53,18 +59,20 @@ public class MarcaResourceTest extends BaseTest {
         given()
             .contentType(ContentType.JSON)
             .body(dto)
-            .when().post(MARCA_PATH)
-            .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .body("id", notNullValue())
-                .body("nome", is("Sony"))
-                .body("paisOrigem", is("Japão"))
-                .body("anoFundacao", is(1946))
-                .body("siteOficial", is("https://www.sony.com"))
-                .body("logo", is("sony-logo.png"));
+        .when()
+            .post(MARCA_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .body("id", notNullValue())
+            .body("nome", is("Sony"))
+            .body("paisOrigem", is("Japão"))
+            .body("anoFundacao", is(1946))
+            .body("siteOficial", is("https://www.sony.com"))
+            .body("logo", is("sony-logo.png"));
     }
 
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     @TestTransaction
     public void testUpdateMarca() {
 
@@ -76,10 +84,12 @@ public class MarcaResourceTest extends BaseTest {
                 "microsoft-logo.png"
         );
 
-        Long idCriado = given()
-                .contentType(ContentType.JSON)
-                .body(dto)
-                .when().post(MARCA_PATH)
+        Long idCriado =
+                given()
+                    .contentType(ContentType.JSON)
+                    .body(dto)
+                .when()
+                    .post(MARCA_PATH)
                 .then()
                     .extract().jsonPath().getLong("id");
 
@@ -95,16 +105,18 @@ public class MarcaResourceTest extends BaseTest {
             .contentType(ContentType.JSON)
             .body(atualizado)
             .pathParam("id", idCriado)
-            .when().put(MARCA_ID_PATH)
-            .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .body("id", equalTo(idCriado.intValue()))
-                .body("nome", is("Microsoft Gaming"))
-                .body("siteOficial", is("https://gaming.microsoft.com"))
-                .body("logo", is("ms-gaming-logo.png"));
+        .when()
+            .put(MARCA_ID_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .body("id", equalTo(idCriado.intValue()))
+            .body("nome", is("Microsoft Gaming"))
+            .body("siteOficial", is("https://gaming.microsoft.com"))
+            .body("logo", is("ms-gaming-logo.png"));
     }
 
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     @TestTransaction
     public void testDeleteMarca() {
 
@@ -116,46 +128,54 @@ public class MarcaResourceTest extends BaseTest {
                 "nintendo-logo.png"
         );
 
-        Long idCriado = given()
-                .contentType(ContentType.JSON)
-                .body(dto)
-                .when().post(MARCA_PATH)
+        Long idCriado =
+                given()
+                    .contentType(ContentType.JSON)
+                    .body(dto)
+                .when()
+                    .post(MARCA_PATH)
                 .then()
                     .extract().jsonPath().getLong("id");
 
         given()
             .pathParam("id", idCriado)
-            .when().delete(MARCA_ID_PATH)
-            .then()
-                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
+        .when()
+            .delete(MARCA_ID_PATH)
+        .then()
+            .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
         given()
             .pathParam("id", idCriado)
-            .when().get(MARCA_ID_PATH)
-            .then()
-                .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+        .when()
+            .get(MARCA_ID_PATH)
+        .then()
+            .statusCode(Response.Status.NOT_FOUND.getStatusCode());
     }
 
     @Test
+    @TestSecurity(user = "test-admin", roles = "ADMIN")
     @TestTransaction
     public void testFindByNome() {
 
         given()
             .contentType(ContentType.JSON)
             .body(new MarcaDTO("8BitDo", "China", 2013, "https://www.8bitdo.com", "8bitdo.png"))
-            .when().post(MARCA_PATH);
+        .when()
+            .post(MARCA_PATH);
 
         given()
             .contentType(ContentType.JSON)
             .body(new MarcaDTO("8BitDo Pro Series", "China", 2015, "https://www.8bitdo.com/pro", "8bitdo-pro.png"))
-            .when().post(MARCA_PATH);
+        .when()
+            .post(MARCA_PATH);
 
         given()
             .pathParam("nome", "8BitDo")
-            .when().get(MARCA_SEARCH_PATH)
-            .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .body("size()", greaterThanOrEqualTo(2))
-                .body("[0].nome", containsString("8BitDo"));
+        .when()
+            .get(MARCA_SEARCH_PATH)
+        .then()
+            .statusCode(Response.Status.OK.getStatusCode())
+            .body("size()", greaterThanOrEqualTo(2))
+            .body("[0].nome", containsString("8BitDo"));
     }
 }

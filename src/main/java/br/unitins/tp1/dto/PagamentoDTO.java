@@ -1,8 +1,14 @@
 package br.unitins.tp1.dto;
 
-import br.unitins.tp1.model.FormaPagamento;
+import jakarta.validation.constraints.NotBlank;
 
 public record PagamentoDTO(
-    FormaPagamento formaPagamento,
-    Double valorTotal
+
+     @NotBlank
+    String metodoPagamento,
+
+    Long idCartaoSalvo,     
+    String numeroCartao,
+    String nomeImpresso,
+    String validade
 ) {}

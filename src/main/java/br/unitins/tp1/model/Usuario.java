@@ -2,8 +2,7 @@ package br.unitins.tp1.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+
 
 @Entity
 public class Usuario extends DefaultEntity {
@@ -12,15 +11,16 @@ public class Usuario extends DefaultEntity {
 
     @Column(unique = true)
     private String login;
-
     private String senha;
-
-    @Enumerated(EnumType.STRING)
+    private String email;
+    private String telefone;
+    
     private Perfil perfil;
 
     public String getNome() {
         return nome;
     }
+
     public void setNome(String nome) {
         this.nome = nome;
     }
@@ -28,6 +28,7 @@ public class Usuario extends DefaultEntity {
     public String getLogin() {
         return login;
     }
+
     public void setLogin(String login) {
         this.login = login;
     }
@@ -35,6 +36,7 @@ public class Usuario extends DefaultEntity {
     public String getSenha() {
         return senha;
     }
+
     public void setSenha(String senha) {
         this.senha = senha;
     }
@@ -42,7 +44,26 @@ public class Usuario extends DefaultEntity {
     public Perfil getPerfil() {
         return perfil;
     }
+
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+
 }

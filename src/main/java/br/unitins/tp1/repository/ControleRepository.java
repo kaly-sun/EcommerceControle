@@ -37,4 +37,15 @@ public class ControleRepository implements PanacheRepository<Controle> {
         }
         return find("UPPER(nome) LIKE ?1", "%" + nome.toUpperCase() + "%").list();
     }
+
+    public List<Controle> findByCategoria(String categoria) {
+    if (categoria == null || categoria.isBlank()) {
+        return List.of();
+    }
+
+    return find(
+        "SELECT DISTINCT c FROM Controle c JOIN c.categorias cat WHERE UPPER(cat.nome) LIKE ?1",
+        "%" + categoria.toUpperCase() + "%"
+    ).list();
+}
 }

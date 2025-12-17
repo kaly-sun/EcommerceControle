@@ -1,4 +1,3 @@
-
 package br.unitins.tp1.service;
 
 import java.util.List;
@@ -19,30 +18,33 @@ public class MarcaServiceImpl implements MarcaService {
     MarcaRepository repository;
 
     @Override
-    public List<MarcaDTOResponse> getAll() {
-        return repository.listAll().stream()
+    public List<MarcaDTOResponse> listarTodos() {
+        return repository.listAll()
+                .stream()
                 .map(MarcaDTOResponse::new)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public MarcaDTOResponse findById(Long id) {
+    public MarcaDTOResponse buscarPorId(Long id) {
         Marca marca = repository.findById(id);
-        if (marca == null)
+        if (marca == null) {
             return null;
+        }
         return new MarcaDTOResponse(marca);
     }
 
     @Override
-    public List<MarcaDTOResponse> findByNome(String nome) {
-        return repository.findByNome(nome).stream()
+    public List<MarcaDTOResponse> buscarPorNome(String nome) {
+        return repository.findByNome(nome)
+                .stream()
                 .map(MarcaDTOResponse::new)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public MarcaDTOResponse create(MarcaDTO dto) {
+    public MarcaDTOResponse criar(MarcaDTO dto) {
         Marca nova = new Marca();
         nova.setNome(dto.nome());
         nova.setPaisOrigem(dto.paisOrigem());
@@ -56,10 +58,11 @@ public class MarcaServiceImpl implements MarcaService {
 
     @Override
     @Transactional
-    public MarcaDTOResponse update(Long id, MarcaDTO dto) {
+    public MarcaDTOResponse atualizar(Long id, MarcaDTO dto) {
         Marca existente = repository.findById(id);
-        if (existente == null)
+        if (existente == null) {
             return null;
+        }
 
         existente.setNome(dto.nome());
         existente.setPaisOrigem(dto.paisOrigem());
@@ -72,7 +75,7 @@ public class MarcaServiceImpl implements MarcaService {
 
     @Override
     @Transactional
-    public void delete(Long id) {
+    public void deletar(Long id) {
         Marca marca = repository.findById(id);
         if (marca != null) {
             repository.delete(marca);

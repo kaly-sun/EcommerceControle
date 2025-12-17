@@ -12,7 +12,6 @@ public class EstoqueService {
     @Inject
     ControleRepository controleRepository;
 
-    // Consultar estoque atual
     public Integer consultarEstoque(Long idControle) {
         Controle controle = controleRepository.findById(idControle);
         if (controle == null)
@@ -21,7 +20,6 @@ public class EstoqueService {
         return controle.getEstoque();
     }
 
-    // Debitar estoque
     @Transactional
     public void debitarEstoque(Long idControle, int quantidade) {
         Controle controle = controleRepository.findById(idControle);
@@ -37,7 +35,6 @@ public class EstoqueService {
         controle.setEstoque(estoqueAtual - quantidade);
     }
 
-    // Adicionar estoque
     @Transactional
     public void adicionarEstoque(Long idControle, int quantidade) {
         Controle controle = controleRepository.findById(idControle);

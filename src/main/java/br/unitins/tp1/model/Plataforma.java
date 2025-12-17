@@ -18,7 +18,6 @@ public class Plataforma {
     private Integer anoLancamento;
     private String tipo;
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }

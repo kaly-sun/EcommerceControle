@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class EnderecoEntrega {
@@ -12,20 +13,29 @@ public class EnderecoEntrega {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    private Usuario usuario;
+
     private String cep;
-    private String logradouro;
+    private String logradouro; 
     private String numero;
     private String bairro;
     private String cidade;
-    private String estado;
+    private String estado; 
     private String complemento;
+
+
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public String getCep() {
@@ -34,6 +44,14 @@ public class EnderecoEntrega {
 
     public void setCep(String cep) {
         this.cep = cep;
+    }
+
+    public String getRua() {
+        return logradouro;
+    }
+
+    public void setRua(String rua) {
+        this.logradouro = rua;
     }
 
     public String getLogradouro() {
@@ -66,6 +84,14 @@ public class EnderecoEntrega {
 
     public void setCidade(String cidade) {
         this.cidade = cidade;
+    }
+
+    public String getUf() {
+        return estado;
+    }
+
+    public void setUf(String uf) {
+        this.estado = uf;
     }
 
     public String getEstado() {

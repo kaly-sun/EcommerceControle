@@ -1,22 +1,21 @@
 package br.unitins.tp1.dto;
 
-import br.unitins.tp1.model.Perfil;
 import br.unitins.tp1.model.Usuario;
 
-public record UsuarioResponseDTO(
-        Long id,
-        String login,
-        Perfil perfil
-) {
+public record UsuarioResponseDTO(Long id, String login, String senha, String nome, String email, String telefone /*Perfil perfil*/) {
 
     public static UsuarioResponseDTO valueOf(Usuario usuario) {
         if (usuario == null)
             return null;
-
-        return new UsuarioResponseDTO(
-            usuario.getId(),
-            usuario.getLogin(),
-            usuario.getPerfil()
-        );
+        return new UsuarioResponseDTO (
+            usuario.getId(), 
+            usuario.getLogin(), 
+            usuario.getSenha(),
+            usuario.getNome(),
+            usuario.getEmail(),
+            usuario.getTelefone())
+            //usuario.getPerfil())
+            ;
     }
+    
 }

@@ -29,9 +29,9 @@ public class CorServiceImpl implements CorService {
     @Transactional
     public CorDTOResponse update(Long id, CorDTO dto) {
         Cor cor = repository.findById(id);
-        if (cor == null)
-            return null;  // ✅ NÃO LANÇA EXCEÇÃO
-
+        if (cor == null) {
+            return null;
+        }
         cor.setNome(dto.nome());
         cor.setDescricao(dto.descricao());
         return CorDTOResponse.valueOf(cor);
@@ -49,17 +49,17 @@ public class CorServiceImpl implements CorService {
     @Override
     public CorDTOResponse findById(Long id) {
         Cor cor = repository.findById(id);
-        if (cor == null)
-            return null; // ✅ NÃO LANÇA EXCEÇÃO
-
+        if (cor == null) {
+            return null;
+        }
         return CorDTOResponse.valueOf(cor);
     }
 
     @Override
     public List<CorDTOResponse> findAll() {
         return repository.listAll()
-                         .stream()
-                         .map(CorDTOResponse::valueOf)
-                         .collect(Collectors.toList());
+                .stream()
+                .map(CorDTOResponse::valueOf)
+                .collect(Collectors.toList());
     }
 }

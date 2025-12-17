@@ -6,5 +6,7 @@ public record ModeloDTO(
     Integer anoLancamento,
     String descricao,
     String codigoReferencia,
-    Boolean ativo
-) {}
+    Boolean ativo,
+    Long idMarca,
+    Long idPlataforma
+){}

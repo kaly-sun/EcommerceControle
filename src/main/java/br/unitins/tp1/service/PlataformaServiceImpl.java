@@ -19,7 +19,9 @@ public class PlataformaServiceImpl implements PlataformaService {
 
     @Override
     public List<PlataformaDTOResponse> getAll() {
-        return repository.listAll().stream().map(PlataformaDTOResponse::valueOf).collect(Collectors.toList());
+        return repository.listAll().stream()
+                .map(PlataformaDTOResponse::valueOf)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -32,7 +34,9 @@ public class PlataformaServiceImpl implements PlataformaService {
 
     @Override
     public List<PlataformaDTOResponse> findByNome(String nome) {
-        return repository.findByNome(nome).stream().map(PlataformaDTOResponse::valueOf).collect(Collectors.toList());
+        return repository.findByNome(nome).stream()
+                .map(PlataformaDTOResponse::valueOf)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -41,6 +45,7 @@ public class PlataformaServiceImpl implements PlataformaService {
         Plataforma plataforma = new Plataforma();
         updateData(plataforma, dto);
         repository.persist(plataforma);
+        repository.flush(); 
         return PlataformaDTOResponse.valueOf(plataforma);
     }
 
@@ -51,6 +56,7 @@ public class PlataformaServiceImpl implements PlataformaService {
         if (plataforma == null)
             return null;
         updateData(plataforma, dto);
+        repository.flush();  
         return PlataformaDTOResponse.valueOf(plataforma);
     }
 
@@ -58,6 +64,7 @@ public class PlataformaServiceImpl implements PlataformaService {
     @Transactional
     public void delete(Long id) {
         repository.deleteById(id);
+        repository.flush(); 
     }
 
     private void updateData(Plataforma plataforma, PlataformaDTO dto) {

@@ -1,16 +1,25 @@
 package br.unitins.tp1.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class Categoria extends DefaultEntity {
 
     @Column(nullable = false)
-    private String nome; // Ex: sem fio, com fio, edição especial, retrô, profissional
+    private String nome;
 
     @Column(length = 500)
     private String descricao;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "categorias")
+    private List<Controle> controles;
 
     public Categoria() {}
 
@@ -19,10 +28,10 @@ public class Categoria extends DefaultEntity {
         this.descricao = descricao;
     }
 
-    // Getters e Setters
     public String getNome() {
         return nome;
     }
+
     public void setNome(String nome) {
         this.nome = nome;
     }
@@ -30,7 +39,16 @@ public class Categoria extends DefaultEntity {
     public String getDescricao() {
         return descricao;
     }
+
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public List<Controle> getControles() {
+        return controles;
+    }
+
+    public void setControles(List<Controle> controles) {
+        this.controles = controles;
     }
 }
